@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Now Sms Slave</title>
+
+		<!-- Bootstrap CSS -->
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="css/now.css" rel="stylesheet">
+		<link rel="stylesheet" href="/bower_components/vex/css/vex.css" />
+		<link rel="stylesheet" href="/bower_components/vex/css/vex-theme-flat-attack.css" />
+
+		<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+	</head>
+	<body id="drop">
+
+		<div class="container" ng-app="app" ng-cloak>
+			<div class="row show-grid">
+				<div class="col-md-2">
+					<a href="#"><img class="img-responsive" src="img/logo.jpg" alt="Sistema de envios de SMS Bestuse"></a>
+				</div>
+				<div class="col-md-10">
+					<h3>Sistema de envios de SMS Bestuse</h3>
+				</div>
+			</div>
+			<div class="row" ng-controller="HomeController as vm">
+				<div class="overlay" ng-show="vm.processando">
+			        <div class="txt">Processando Aguarde... {{vm.statusEnvio}}</div>
+			        <div class="txt"><a class="text-danger" href="javascript:" ng-click="vm.stop()">interromper</a></div>
+			    </div>
+				<nav id="context-menu" class="context-menu">
+				    <ul class="context-menu__items">
+				      <li class="context-menu__item">
+				        <a href="#" class="context-menu__link" ng-repeat="(letra, valor) in vm.excel['campos']" ng-click="vm.addVariavel(letra)">{{letra}} ex: {{valor['2']}}</a>
+				      </li>
+				    </ul>
+			  	</nav>
+				<div class="col-md-12">
+		            <div class="panel with-nav-tabs panel-primary">
+		                <div class="panel-heading">
+		                        <ul class="nav nav-tabs">
+		                            <li class="active"><a href="#configs" data-toggle="tab">Configurações</a></li>
+		                            <li><a href="#programacao" data-toggle="tab">Programação</a></li>
+		                            <li><a href="#visualizar" data-toggle="tab">Visualizar</a></li>
+		                            <li><a href="#enviar" data-toggle="tab">Enviar</a></li>
+		                            <li><a href="#statusGateway" data-toggle="tab">Status do gateway</a></li>
+		                        </ul>
+		                </div>
+		                <div class="panel-body">
+		                    <div class="tab-content">
+		                    	<!-- CONFIG -->
+		                        <div class="tab-pane fade in active" id="configs">
+		                        	<form class="form-horizontal">
+		          							<div class="form-group">
+								              <label class="col-md-3 control-label" ng-class="{'text-danger': vm.statusGateway == 'error'}" for="name">Servidor (Gateway)</label>
+								              <div class="col-md-9">
+								                <input ng-model-options="{debounce: {'default': 1000, 'blur': 0}}" ng-model="vm.form.servidor" ng-change="vm.saveForm()" ng-blur="vm.getStatusGateway()" type="text" placeholder="Servidor" class="form-control">
+								              </div>
+								            </div>
+
+								            <div class="form-group">
+								              <label class="col-md-3 control-label" for="name">Servidor (Proxy)</label>
+								              <div class="col-md-9">
+								                <input ng-model-options="{debounce: {'default': 1000, 'blur': 0}}" ng-model="vm.form.servidorProxy"  ng-change="vm.saveForm()" type="text" placeholder="http://localhost:2525" class="form-control">
+								              </div>
+								            </div>
+
+		            		            	<div class="form-group">
+								              <label class="col-md-3 control-label" for="message">Limite Caracteres</label>
+								              <div class="col-md-9">
+								                <input ng-model-options="{debounce: {'default': 1000, 'blur': 0}}" class="form-control"  ng-change="vm.saveForm()" ng-model="vm.form.limite" placeholder="Limite Caracteres da Mensagem">
+								              </div>
+								            </div>
+
+								            <div class="form-group">
+								              <label class="col-md-3 control-label" for="usuario">Usuário</label>
+								              <div class="col-md-9">
+								                <input ng-model-options="{debounce: {'default': 1000, 'blur': 0}}" class="form-control"  ng-change="vm.saveForm()" ng-model="vm.form.user" placeholder="Usuário de login do NOWSMS">
+								              </div>
+								            </div>
+								            <div class="form-group">
+								              <label class="col-md-3 control-label" for="usuario">Senha</label>
+								              <div class="col-md-9">
+								                <input ng-model-options="{debounce: {'default': 1000, 'blur': 0}}" class="form-control"  ng-change="vm.saveForm()" type="password" ng-model="vm.form.pass" placeholder="Senha de login do NOWSMS">
+								              </div>
+								            </div>
+
+			            		            <div class="form-group">
+											   	<label class="col-xs-3 control-label">Tipo da mensagem</label>
+											   	<div class="col-xs-9">
+													<div class="row">
+														<div class="col-md-1">
+														    <div class="radio">
+														     <label>
+														      <input value="0" ng-change="vm.saveForm()" ng-model="vm.form.dcs" type="radio">
+														      Flash</label>
+														    </div>
+														</div>
+														<div class="col-md-1">
+														    <div class="radio">
+														     <label>
+														      <input value="1" ng-change="vm.saveForm()" ng-model="vm.form.dcs" type="radio">
+														      Normal</label>
+														    </div>
+														</div>
+													</div>
+											   	</div>
+										  	</div>
+										  <div class="col-md-10 col-md-offset-2">
+										  		Status da conexão:
+										  		<div class="alert" ng-show="vm.statusGateway != 'error'" ng-class="{'alert-success': vm.statusGateway != 'error'}" role="alert">Conectado com sucesso!</div>
+
+										  		<div class="alert" ng-hide="vm.statusGateway != 'error'" ng-class="{'alert-danger': vm.statusGateway == 'error'}" role="alert">Verifique os parametros!</div>
+										  </div>
+
+		          					</form>
+		                        </div>
+		                        <!-- PROGRAMAÇÃO -->
+		                        <div class="tab-pane fade" id="programacao">
+									<form class="form-horizontal">
+										<div class="form-group">
+											<div class="col-md-12">
+							                	<strong class="text-center" ng-show="vm.loading">Analizando... aguarde...</strong>
+			                        			 <a class="btn btn-info" ngf-select ngf-change="vm.uploadFile($files)">
+			                        			 		Selecionar arquivo
+			                        			 </a>
+							                </div>
+										</div>
+										<div class="form-group">
+
+							                <div class="col-md-12">
+							                	Mensagem (edição): <input type="text"  ng-model="vm.form.mensagem" class="form-control">
+							                </div>
+							                <div class="well task" data-id="2">
+							                Selecione o texto para adicionar varíavel: <br>
+							                	<strong>{{vm.form.mensagem}}</strong>
+							                </div>
+							            </div>
+
+							            <div class="form-group">
+							              <label class="col-md-3 control-label" for="name">Numero para teste</label>
+							              <div class="col-md-6">
+							                <input ng-model="vm.form.numeroteste" type="text" placeholder="Numero para teste" class="form-control">
+							              </div>
+							              <div class="col-md-3">
+							              	<input type="button" ng-click="vm.enviarTeste()" class="btn btn-info" value="Enviar mensagem de teste">
+							              </div>
+							            </div>
+
+							             <div class="form-group">
+							              <label class="col-md-3 control-label" for="identificacao">Identificação do arquivo</label>
+							              <div class="col-md-9">
+							                <input ng-model="vm.form.identificacao" class="form-control" type="text" placeholder="Identificação do arquivo">
+							              </div>
+							            </div>
+
+										 <div class="form-group">
+										   	<label class="col-xs-3 control-label">Campo dos números</label>
+										   	<div class="col-xs-9">
+										   			<div ng-show="!vm.excel.campos">
+										   				Nenhum arquivo carregado.
+										   			</div>
+												<div class="row">
+													<div class="col-md-1" ng-repeat="(letra, valor) in vm.excel.campos">
+													    <div class="radio">
+													     <label>
+													      <input
+													      	value="{{letra}}"
+													      	ng-model="vm.form.campoNumeros"
+													      	type="radio"
+													      	ng-click="vm.getNumbers(letra)"
+													      	ng-change="vm.saveForm()"
+													      >
+													      {{letra}}</label>
+													    </div>
+													</div>
+												</div>
+										   	</div>
+									  	</div>
+
+		                        	 	<div class="form-group">
+							              <label class="col-md-3 control-label" for="name">Numeros ({{vm.form.qtdNumeros}})</label>
+							              <div class="col-md-9">
+							                <input ng-model="vm.form.numeros" type="text" placeholder="Numeros" class="form-control">
+							              </div>
+							            </div>
+
+							            <div class="form-group">
+							              <label class="col-md-3 control-label" for="name">Numeros de Confirmação ({{vm.form.qtdNumerosConfir}})</label>
+							              <div class="col-md-9">
+							                <input ng-model="vm.form.numerosConfirmacao" ng-change="vm.replaceNumsConfir()" type="text" placeholder="Numeros que serão enviados no começo, meio e fim dos envios" class="form-control">
+							              </div>
+							            </div>
+
+
+
+									</form>
+									<div class="row">
+										<div class="col-md-12">
+											<table class="table table-striped table-hover">
+									      		<thead>
+									      			<tr>
+									      				<th>Variável</th>
+									      				<th>Substituída por (separado por ponto e vírgula</th>
+									      				<th>Ações</th>
+									      			</tr>
+									      		</thead>
+									      		<tbody>
+									      			<tr ng-repeat="(key, var) in vm.variaveis">
+									      				<td>{{var.var}}</td>
+									      				<td>{{var.text.trunc(100)}}</td>
+									      				<td><a href="javascript:" ng-click="vm.removerVar(key)">remover</a></td>
+									      			</tr>
+									      		</tbody>
+									      	</table>
+										</div>
+									</div>
+		                        </div>
+		                        <!-- STATUS GATEWAY -->
+		                        <div class="tab-pane fade" id="statusGateway">
+		                        	<div class="row">
+		                        		<div class="col-md-2">
+		                        			<button class="btn" ng-click="vm.getStatusGateway()">Atualizar</button>
+		                        		</div>
+		                        		<div class="col-md-10">
+		                        			<div class="well">
+		                        				<table class="table table-striped table-hover">
+		                        					<thead>
+		                        						<tr>
+		                        							<th>Porta</th>
+		                        							<th>Status</th>
+		                        							<th>Detalhes</th>
+		                        							<th>Enviadas Hoje</th>
+		                        							<th>Enviadas 7 ultimos dias</th>
+		                        							<th>Enviadas 30 ultimos dias</th>
+		                        						</tr>
+		                        					</thead>
+		                        					<tbody>
+		                        						<tr ng-repeat="gt in vm.statusGateway.NowSMSStatus[0].SMSCStatus">
+		                        							<td>{{gt.Name[0]._text}}</td>
+		                        							<td>{{gt.Status[0]._text}}</td>
+		                        							<td>{{gt.StatusDetail[0]._text}}</td>
+		                        							<td>{{gt.MessagesToday[0]._text}}</td>
+		                        							<td>{{gt.MessagesLast7Days[0]._text}}</td>
+		                        							<td>{{gt.MessagesLast30Days[0]._text}}</td>
+		                        						</tr>
+		                        					</tbody>
+		                        				</table>
+		                        			</div>
+		                        		</div>
+		                        	</div>
+		                        </div>
+		                        <div class="tab-pane fade" id="visualizar">
+		                        	<form class="form-horizontal">
+		                        		  <div class="form-group">
+								              <label class="col-md-3 control-label" for="message">Visualizar mensagens</label>
+
+								              <div class="col-md-9">
+							              		<div class="input-group">
+											      <input ng-model="vm.qtdPreview" ng-change="vm.visualizar()"  type="text" class="form-control" placeholder="Número de msgs para visualizar">
+											      <span class="input-group-btn">
+											        <button ng-click="vm.visualizar()" class="btn btn-default" type="button">Visualizar</button>
+											      </span>
+											    </div><!-- /input-group -->
+
+								              </div>
+								            </div>
+								            <div class="row">
+								            	<div class="col-md-10 col-md-offset-2">
+								            			<table class="table table-striped table-hover">
+												      		<thead>
+												      			<tr>
+												      				<th>Número</th>
+												      				<th>Mensagem</th>
+												      			</tr>
+												      		</thead>
+												      		<tbody>
+												      			<tr ng-repeat="m in vm.previews">
+												      				<td>{{m.numero}}</td>
+												      				<td ng-class="{'text-danger':m.texto.length > vm.form.limite}">{{m.texto}}</td>
+												      			</tr>
+												      		</tbody>
+												      	</table>
+								            	</div>
+								            </div>
+		                        	</form>
+		                        </div>
+		                        <div class="tab-pane fade" id="enviar">
+		                        	<form class="form-horizontal">
+		                        		 <div class="form-group">
+							              	<label class="col-md-3 control-label" for="message">Logs</label>
+							              	<div class="col-md-9">
+							              		<textarea class="form-control" id="status" ng-model="vm.status" placeholder="Status das ações realizadas no sistema, a ordem que está aqui não é a mesma do gateway, no gateway ele manda conforme a sequência." rows="5"></textarea>
+						            		</div>
+							            </div>
+							            <div class="col-md-9 col-md-offset-3">
+							            	 <div class="progress">
+											  <div class="progress-bar" role="progressbar" aria-valuenow="{{vm.percent}}" aria-valuemin="0" aria-valuemax="100" style="width: {{vm.percent}}%;">
+
+											  </div>
+											</div>
+											{{vm.statusEnvio}}
+							            </div>
+							            <div class="form-group">
+							              	<label class="col-md-3 control-label" for="name">Portas Gateway</label>
+							              	<div class="col-md-9">
+							                	<input ng-model="vm.controle.portas" type="number" placeholder="Quantidade de portas que o gateway conectado tem" class="form-control">
+							              	</div>
+							            </div>
+						             	<div class="form-group">
+							              	<label class="col-md-3 control-label" for="name">Quantidade de mensagens</label>
+							              	<div class="col-md-9">
+							                	<input ng-model="vm.controle.qtdMsgs" type="number" placeholder="Enviar x mensagens" class="form-control">
+							              	</div>
+							            </div>
+							            <div class="form-group">
+							              	<label class="col-md-3 control-label" for="name">Intervalo em segundos</label>
+							              	<div class="col-md-9">
+							                	<input ng-model="vm.controle.intervalo" type="number" placeholder="a cada x segundos" class="form-control">
+							              	</div>
+							            </div>
+							            <div class="form-group">
+							              	<label class="col-md-3 control-label" for="name">Repetir confirmação a cada x números</label>
+							              	<div class="col-md-9">
+							                	<input ng-model="vm.controle.confirmarcada" type="number" placeholder="Intervalo em quantidade de números para repetir a confirmação" class="form-control">
+							              	</div>
+							            </div>
+		                        		 <div class="form-group">
+							            	<div class="col-md-12 text-right">
+							                	<button ng-disabled="!vm.valida()" type="button" class="btn btn-primary btn-lg" ng-click="vm.enviar()">Enviar</button>
+							            	</div>
+							            </div>
+
+		                        	</form>
+		                        </div>
+		                    </div>
+		                </div>
+		            </div>
+		        </div>
+
+
+			</div>
+		</div>
+
+		<script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
+
+		<script src="/bower_components/jquery/dist/jquery.min.js"></script>
+		<script src="/bower_components/angular/angular.min.js"></script>
+		<script src="/bower_components/underscore/underscore-min.js"></script>
+		<script src="/bower_components/js-xlsx/dist/xlsx.full.min.js"></script>
+
+		<script src="/bower_components/ng-file-upload/ng-file-upload-shim.min.js"></script>
+		<!-- for no html5 browsers support -->
+		<script src="/bower_components/ng-file-upload/ng-file-upload.min.js"></script>
+
+		<script src="/bower_components/vex/js/vex.combined.min.js"></script>
+		<script>vex.defaultOptions.className = 'vex-theme-flat-attack';</script>
+
+
+		<!-- Modulos -->
+		<script src="/app/app.js"></script>
+		<script src="/app/home/home.module.js"></script>
+		<script src="/app/home/home.controller.js"></script>
+		<!-- Core -->
+		<script src="/app/core/core.module.js"></script>
+		<script src="/app/core/datacontext.factory.js"></script>
+		<script src="/app/core/localstorage.factory.js"></script>
+		<script src="/js/xmlToJSON.js"></script>
+		<script src="/js/rightClickContext.js"></script>
+		<script src="/js/utils.js"></script>
+
+		<script>
+			var socket = io.connect('localhost:8081');
+			var socketServer = io.connect('localhost:2233');
+		</script>
+
+		<!-- Bootstrap JavaScript -->
+		<script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+	</body>
+</html>
