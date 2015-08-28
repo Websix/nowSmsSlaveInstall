@@ -134,7 +134,8 @@ var vm;
         function enviarTeste()
         {
             if(vm.statusGateway != 'errors') {
-                for (var i = 0; i < vm.numeros.length; i++) {
+
+                for (var i = 0; i < vm.numeros.length > 5 ? 5 : vm.numeros.length; i++) {
                     var numero = vm.form.numeroteste;
                     if(numero == '') {
                         vex.dialog.alert('Sem número!');
