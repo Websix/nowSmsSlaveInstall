@@ -133,27 +133,30 @@ var vm;
 
         function enviarTeste()
         {
-            if(vm.statusGateway != 'error') {
-                var numero = vm.form.numeroteste;
-                if(numero == '') {
-                    vex.dialog.alert('Sem número!');
-                    return;
-                }
-                var mensagem = vm.form.identificacao + ':' + vm.form.mensagem;
-                if(mensagem == '') {
-                    vex.dialog.alert('Arquivo não carregado!');
-                    return;
-                }
+            if(vm.statusGateway != 'errors') {
+                for (var i = 0; i < vm.numeros.length; i++) {
+                    var numero = vm.form.numeroteste;
+                    if(numero == '') {
+                        vex.dialog.alert('Sem número!');
+                        return;
+                    }
+                    var mensagem = vm.form.identificacao + ':' + vm.form.mensagem;
+                    if(mensagem == '') {
+                        vex.dialog.alert('Arquivo não carregado!');
+                        return;
+                    }
 
-                for (var j = 0; j <= vm.variaveis.length - 1; j++) {
-                    var variavel = vm.variaveis[j].var;
-                    var valor = vm.variaveis[j].text.split(';')[0];
-                    mensagem = mensagem.replace(variavel, valor);
-                };
+                    for (var j = 0; j <= vm.variaveis.length - 1; j++) {
+                        var variavel = vm.variaveis[j].var;
+                        var valor = vm.variaveis[j].text.split(';')[i];
+                        mensagem = mensagem.replace(variavel, valor);
+                    }
 
-                console.log(vm.form.mensagem);
-                sendSms(numero, mensagem, vm.form.dcs, 0);
-                vex.dialog.alert('Mensagem enviada!');
+                    console.log(mensagem);
+
+                    sendSms(numero, mensagem, vm.form.dcs, 0);
+                    vex.dialog.alert('Mensagem enviada!');
+                }
             } else {
                 vex.dialog.alert('Sem conexão com o gateway!');
             }
