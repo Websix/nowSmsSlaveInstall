@@ -35,13 +35,7 @@
 			        <div class="txt">Processando Aguarde... {{vm.statusEnvio}}</div>
 			        <div class="txt"><a class="text-danger" href="javascript:" ng-click="vm.stop()">interromper</a></div>
 			    </div>
-				<nav id="context-menu" class="context-menu">
-				    <ul class="context-menu__items">
-				      <li class="context-menu__item">
-				        <a href="#" class="context-menu__link" ng-repeat="(letra, valor) in vm.excel['campos']" ng-click="vm.addVariavel(letra)">{{letra}} ex: {{valor['2']}}</a>
-				      </li>
-				    </ul>
-			  	</nav>
+
 				<div class="col-md-12">
 		            <div class="panel with-nav-tabs panel-primary">
 		                <div class="panel-heading">
